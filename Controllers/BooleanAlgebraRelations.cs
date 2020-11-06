@@ -17,7 +17,10 @@ namespace backend_learning_algorithm.Controllers
             var relations = new Dictionary<string, int>();
             foreach (BooleanAlgebraRelations relation in Enum.GetValues(typeof(BooleanAlgebraRelations)))
             {
-                relations.Add(relation.ToString(), (int)relation);
+                if ((int)relation != 0)
+                {
+                    relations.Add(relation.ToString(), (int)relation);
+                }
             }
             return relations;
         }
