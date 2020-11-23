@@ -1,8 +1,26 @@
+using System;
 using System.Collections.Generic;
+
 namespace backend_learning_algorithm.Common
 {
     public class BooleanAlgebra
     {
+        public static List<BooleanAlgebraRelations> TransitiveTableRecord(string firstRelation, string secondRelation)
+        {
+            if (firstRelation.Equals("None") || secondRelation.Equals("None"))
+            {
+                return new List<BooleanAlgebraRelations>();
+            }
+            var firstRelationEnum = (BooleanAlgebraRelations)Enum.Parse(typeof(BooleanAlgebraRelations), firstRelation, true);
+            var secondRelationEnum = (BooleanAlgebraRelations)Enum.Parse(typeof(BooleanAlgebraRelations), secondRelation, true);
+            if (!Enum.IsDefined(typeof(BooleanAlgebraRelations), firstRelationEnum) || !Enum.IsDefined(typeof(BooleanAlgebraRelations), secondRelationEnum))
+            {
+                return new List<BooleanAlgebraRelations>();
+            }
+            var transitiveTable = new Dictionary<Tuple<BooleanAlgebraRelations, BooleanAlgebraRelations>, List<BooleanAlgebraRelations>>();
+            return transitiveTable[new Tuple<BooleanAlgebraRelations, BooleanAlgebraRelations>(firstRelationEnum, secondRelationEnum)];
+        }
+
         public static Dictionary<BooleanAlgebraRelations, BooleanAlgebraRelations> GetInverseRelations()
         {
             return new Dictionary<BooleanAlgebraRelations, BooleanAlgebraRelations>(){
