@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using backend_learning_algorithm.Common;
+using backend_learning_algorithm.Common;    
+using backend_learning_algorithm.Contracts;
 
 namespace backend_learning_algorithm.Controllers
 {
@@ -23,6 +24,12 @@ namespace backend_learning_algorithm.Controllers
                 }
             }
             return relations;
+        }
+
+        [HttpPost("constraintNetwork")]
+        public Network PostConstraintNetwork([FromBody] Network network)
+        {
+            return network;
         }
     }
 }
