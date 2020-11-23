@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace backend_learning_algorithm.Common
 {
     public enum BooleanAlgebraRelations
