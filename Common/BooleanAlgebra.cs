@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using backend_learning_algorithm.Contracts;
 using BAR = backend_learning_algorithm.Common.BooleanAlgebraRelations;
 
 namespace backend_learning_algorithm.Common
 {
     public class BooleanAlgebra
     {
-        private static List<List<BAR>> TransitiveTable = new List<List<BAR>>
+        public static List<List<BAR>> TransitiveTableList = new List<List<BAR>>
         {
             // First Relation being Precedes
             new List<BAR> { BAR.Precedes, BAR.Precedes, BAR.Precedes },
@@ -189,6 +190,7 @@ namespace backend_learning_algorithm.Common
             new List<BAR> { BAR.Preceded_by, BAR.Met_by, BAR.Preceded_by },
             new List<BAR> { BAR.Preceded_by, BAR.Preceded_by, BAR.Preceded_by }
         };
+
         public static List<BAR> TransitiveTableRecord(string firstRelation, string secondRelation)
         {
             if (firstRelation.Equals("None") || secondRelation.Equals("None"))
@@ -203,7 +205,7 @@ namespace backend_learning_algorithm.Common
             }
 
             var tableRecord = new List<BAR>();
-            foreach (var pair in BooleanAlgebra.TransitiveTable)
+            foreach (var pair in BooleanAlgebra.TransitiveTableList)
             {
                 if (pair[0].Equals(firstRelationEnum) && pair[1].Equals(secondRelationEnum))
                 {
@@ -216,7 +218,8 @@ namespace backend_learning_algorithm.Common
 
         public static Dictionary<BAR, BAR> GetInverseRelations()
         {
-            return new Dictionary<BAR, BAR>(){
+            return new Dictionary<BAR, BAR>()
+            {
                 { BAR.Contains, BAR.During },
                 { BAR.During, BAR.Contains },
                 { BAR.Finishes, BAR.Finished_by },
@@ -234,6 +237,11 @@ namespace backend_learning_algorithm.Common
             return inverseRelations.ContainsKey(booleanAlgebraRelation) ?
                    inverseRelations[booleanAlgebraRelation] :
                    BAR.None;
+        }
+
+        public static Network ConstraintPropagation(Network inputNetwork)
+        {
+            return new Network();
         }
     }
 }
