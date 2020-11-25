@@ -18,7 +18,7 @@ namespace backend_learning_algorithm.Contracts
         public Relationship(string firstVar, string secondVar, List<string> relations)
         {
             this.FirstVar = firstVar;
-            this.SecondVar = SecondVar;
+            this.SecondVar = secondVar;
             this.Relations = relations;
         }
     }
