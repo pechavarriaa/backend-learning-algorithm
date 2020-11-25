@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using backend_learning_algorithm.Common;
 using backend_learning_algorithm.Contracts;
+using static backend_learning_algorithm.Common.BooleanAlgebra;
 
 namespace backend_learning_algorithm.Controllers
 {
@@ -29,8 +30,7 @@ namespace backend_learning_algorithm.Controllers
         [HttpPost("constraintNetwork")]
         public Network PostConstraintNetwork([FromBody] Network network)
         {
-            var constrainedNetwork = backend_learning_algorithm.Common.BooleanAlgebra.ConstraintPropagation(network);
-            return network;
+            return PathConsistency(network);
         }
     }
 }
