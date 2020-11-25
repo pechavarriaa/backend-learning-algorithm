@@ -214,6 +214,12 @@ namespace backend_learning_algorithm.Common
         {
             return new Dictionary<BAR, BAR>()
             {
+                { BAR.Precedes, BAR.Preceded_by},
+                { BAR.Preceded_by, BAR.Precedes },
+                { BAR.Meets, BAR.Met_by },
+                { BAR.Met_by, BAR.Meets },
+                { BAR.Overlaps, BAR.Overlapped_by },
+                { BAR.Overlapped_by, BAR.Overlaps },
                 { BAR.Contains, BAR.During },
                 { BAR.During, BAR.Contains },
                 { BAR.Finishes, BAR.Finished_by },
@@ -227,7 +233,6 @@ namespace backend_learning_algorithm.Common
         public static BAR GetInverseRelation(BAR booleanAlgebraRelation)
         {
             var inverseRelations = BooleanAlgebra.GetInverseRelations();
-
             return inverseRelations.ContainsKey(booleanAlgebraRelation) ?
                    inverseRelations[booleanAlgebraRelation] :
                    BAR.None;
@@ -246,8 +251,12 @@ namespace backend_learning_algorithm.Common
                 for (var j = i + 1; j < inputNetwork.Variables.Count; j++)
                 {
                     var tempTuple = new Tuple<string, string>(inputNetwork.Variables[i], inputNetwork.Variables[j]);
-                    graphRelations.Add(tempTuple, Enum.GetValues(typeof(BAR)).Cast<BAR>().Where(rel => rel != BAR.None).ToList());
+                    var tempTupleReverse = new Tuple<string, string>(inputNetwork.Variables[j], inputNetwork.Variables[i]);
+                    var relationList = Enum.GetValues(typeof(BAR)).Cast<BAR>().Where(rel => rel != BAR.None).ToList();
+                    graphRelations.Add(tempTuple, relationList);
+                    graphRelations.Add(tempTupleReverse, relationList);
                     pcList.Push(tempTuple);
+                    pcList.Push(tempTupleReverse);
                 }
             }
 
@@ -262,6 +271,19 @@ namespace backend_learning_algorithm.Common
                 }
                 var tempTuple = new Tuple<string, string>(networkRelations.FirstVar, networkRelations.SecondVar);
                 graphRelations[tempTuple] = tempBarList;
+            }
+
+            // set inverse relations for reverse pair (b,a if a,b is set)
+            foreach (var tuple in pcList)
+            {
+                if (graphRelations[tuple].Count != Enum.GetValues(typeof(BAR)).Cast<BAR>().Where(rel => rel != BAR.None).ToList().Count)
+                {
+                    var reverseTuple = new Tuple<string, string>(tuple.Item2, tuple.Item1);
+                    if (graphRelations[reverseTuple].Count == Enum.GetValues(typeof(BAR)).Cast<BAR>().Where(rel => rel != BAR.None).ToList().Count)
+                    {
+                        graphRelations[reverseTuple] = graphRelations[tuple].Select(rel => GetInverseRelation(rel)).ToList();
+                    }
+                }
             }
 
             while (pc && pcList.Any())
@@ -297,7 +319,7 @@ namespace backend_learning_algorithm.Common
                     }
 
                     var intersection = graphRelations[ik].Intersect(tempSet.ToList()).ToList();
-                    if (!intersection.All(graphRelations[ik].Contains))
+                    if (!graphRelations[ik].All(intersection.Contains))
                     {
                         graphRelations[ik] = intersection;
                         graphRelations[ki] = intersection.Select(rel => BooleanAlgebra.GetInverseRelation(rel)).ToList();
@@ -324,7 +346,7 @@ namespace backend_learning_algorithm.Common
                         }
                     }
                     intersection = graphRelations[kj].Intersect(tempSet.ToList()).ToList();
-                    if (!intersection.All(graphRelations[kj].Contains))
+                    if (!graphRelations[kj].All(intersection.Contains))
                     {
                         graphRelations[jk] = intersection.Select(rel => BooleanAlgebra.GetInverseRelation(rel)).ToList();
                         if (!pcList.Contains(kj))
