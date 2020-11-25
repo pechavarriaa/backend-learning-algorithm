@@ -191,29 +191,23 @@ namespace backend_learning_algorithm.Common
             new List<BAR> { BAR.Preceded_by, BAR.Preceded_by, BAR.Preceded_by }
         };
 
-        public static List<BAR> TransitiveTableRecord(string firstRelation, string secondRelation)
+        public static List<BAR> TransitiveTableRecord(BAR firstRelation, BAR secondRelation)
         {
-            if (firstRelation.Equals("None") || secondRelation.Equals("None"))
-            {
-                return new List<BAR>();
-            }
-            var firstRelationEnum = (BAR)Enum.Parse(typeof(BAR), firstRelation, true);
-            var secondRelationEnum = (BAR)Enum.Parse(typeof(BAR), secondRelation, true);
-            if (!Enum.IsDefined(typeof(BAR), firstRelationEnum) || !Enum.IsDefined(typeof(BAR), secondRelationEnum))
+            if (firstRelation.Equals(BAR.None) || secondRelation.Equals(BAR.None))
             {
                 return new List<BAR>();
             }
 
-            var tableRecord = new List<BAR>();
             foreach (var pair in BooleanAlgebra.TransitiveTableList)
             {
-                if (pair[0].Equals(firstRelationEnum) && pair[1].Equals(secondRelationEnum))
+                if (pair[0].Equals(firstRelation) && pair[1].Equals(secondRelation))
                 {
                     // skip first two relations wich are the input
-                    tableRecord = pair.Skip(2).ToList();
+                    return pair.Skip(2).ToList();
                 }
             }
-            return tableRecord;
+
+            return new List<BAR>();
         }
 
         public static Dictionary<BAR, BAR> GetInverseRelations()
@@ -239,9 +233,124 @@ namespace backend_learning_algorithm.Common
                    BAR.None;
         }
 
-        public static Network ConstraintPropagation(Network inputNetwork)
+        public static Network PathConsistency(Network inputNetwork)
         {
-            return new Network();
+            var graphRelations = new Dictionary<Tuple<string, string>, List<BAR>>();
+
+            var pc = true;
+            var pcList = new Stack<Tuple<string, string>>();
+
+            // Set all possible relations for all variables in network
+            for (var i = 0; i < inputNetwork.Variables.Count; i++)
+            {
+                for (var j = i + 1; j < inputNetwork.Variables.Count; j++)
+                {
+                    var tempTuple = new Tuple<string, string>(inputNetwork.Variables[i], inputNetwork.Variables[j]);
+                    graphRelations.Add(tempTuple, Enum.GetValues(typeof(BAR)).Cast<BAR>().Where(rel => rel != BAR.None).ToList());
+                    pcList.Push(tempTuple);
+                }
+            }
+
+            // Set relations defined by the user overriding previously set relations
+            foreach (var networkRelations in inputNetwork.Relations)
+            {
+                var tempBarList = new List<BAR>();
+                foreach (var relation in networkRelations.Relations)
+                {
+                    var bar = (BAR)Enum.Parse(typeof(BAR), relation, true);
+                    tempBarList.Add(bar);
+                }
+                var tempTuple = new Tuple<string, string>(networkRelations.FirstVar, networkRelations.SecondVar);
+                graphRelations[tempTuple] = tempBarList;
+            }
+
+            while (pc && pcList.Any())
+            {
+                var lastTuple = pcList.Pop();
+                var varI = lastTuple.Item1;
+                var varJ = lastTuple.Item2;
+
+                foreach (var varK in inputNetwork.Variables)
+                {
+                    if (varI == varK || varJ == varK)
+                    {
+                        continue;
+                    }
+                    var ik = new Tuple<string, string>(varI, varK);
+                    var ij = new Tuple<string, string>(varI, varJ);
+                    var jk = new Tuple<string, string>(varJ, varK);
+                    var ki = new Tuple<string, string>(varK, varI);
+                    var kj = new Tuple<string, string>(varK, varJ);
+
+                    var tempSet = new HashSet<BAR>();
+
+                    foreach (var relIJ in graphRelations[ij])
+                    {
+                        foreach (var relJK in graphRelations[jk])
+                        {
+                            var rels = BooleanAlgebra.TransitiveTableRecord(relIJ, relJK);
+                            foreach (var rel in rels)
+                            {
+                                tempSet.Add(rel);
+                            }
+                        }
+                    }
+
+                    var intersection = graphRelations[ik].Intersect(tempSet.ToList()).ToList();
+                    if (!intersection.All(graphRelations[ik].Contains))
+                    {
+                        graphRelations[ik] = intersection;
+                        graphRelations[ki] = intersection.Select(rel => BooleanAlgebra.GetInverseRelation(rel)).ToList();
+                        if (!pcList.Contains(ik))
+                        {
+                            pcList.Push(ik);
+                        }
+                    }
+                    if (!intersection.Any())
+                    {
+                        pc = false;
+                    }
+
+                    tempSet.Clear();
+                    foreach (var relKI in graphRelations[ki])
+                    {
+                        foreach (var relIJ in graphRelations[ij])
+                        {
+                            var rels = BooleanAlgebra.TransitiveTableRecord(relKI, relIJ);
+                            foreach (var rel in rels)
+                            {
+                                tempSet.Add(rel);
+                            }
+                        }
+                    }
+                    intersection = graphRelations[kj].Intersect(tempSet.ToList()).ToList();
+                    if (!intersection.All(graphRelations[kj].Contains))
+                    {
+                        graphRelations[jk] = intersection.Select(rel => BooleanAlgebra.GetInverseRelation(rel)).ToList();
+                        if (!pcList.Contains(kj))
+                        {
+                            pcList.Push(kj);
+                        }
+                    }
+                    if (!intersection.Any())
+                    {
+                        pc = false;
+                    }
+                }
+            }
+
+            // save constrained relations back to network
+            var constrainedNetwork = inputNetwork;
+            constrainedNetwork.Relations = new List<Relationship>();
+            foreach (var tuple in graphRelations.Keys)
+            {
+                if (graphRelations[tuple].Count + 1 != Enum.GetNames(typeof(BAR)).Length)
+                {
+                    constrainedNetwork.Relations.Add(new Relationship(tuple.Item1, tuple.Item2, graphRelations[tuple].Select(rel => rel.ToString()).ToList()));
+                }
+            }
+
+            return constrainedNetwork;
         }
     }
 }
