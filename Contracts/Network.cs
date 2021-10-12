@@ -5,13 +5,13 @@ namespace backend_learning_algorithm.Contracts
     public class Network
     {
         public List<string> Variables { get; set; }
-        public List<Relationship> Relations { get; set; }
+        public List<Relationship> NetworkRelations { get; set; }
         public Network() { }
 
-        public Network(List<string> variables, List<Relationship> relations)
+        public Network(List<string> variables, List<Relationship> networkRelations)
         {
             this.Variables = variables;
-            this.Relations = relations;
+            this.NetworkRelations = networkRelations;
         }
     }
 }

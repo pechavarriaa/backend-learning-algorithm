@@ -261,7 +261,7 @@ namespace backend_learning_algorithm.Common
             }
 
             // Set relations defined by the user overriding previously set relations
-            foreach (var networkRelations in inputNetwork.Relations)
+            foreach (var networkRelations in inputNetwork.NetworkRelations)
             {
                 var tempBarList = new List<BAR>();
                 foreach (var relation in networkRelations.Relations)
@@ -363,13 +363,10 @@ namespace backend_learning_algorithm.Common
 
             // save constrained relations back to network
             var constrainedNetwork = inputNetwork;
-            constrainedNetwork.Relations = new List<Relationship>();
+            constrainedNetwork.NetworkRelations = new List<Relationship>();
             foreach (var tuple in graphRelations.Keys)
             {
-                if (graphRelations[tuple].Count + 1 != Enum.GetNames(typeof(BAR)).Length)
-                {
-                    constrainedNetwork.Relations.Add(new Relationship(tuple.Item1, tuple.Item2, graphRelations[tuple].Select(rel => rel.ToString()).ToList()));
-                }
+                constrainedNetwork.NetworkRelations.Add(new Relationship(tuple.Item1, tuple.Item2, graphRelations[tuple].Select(rel => rel.ToString()).ToList()));
             }
 
             return constrainedNetwork;
