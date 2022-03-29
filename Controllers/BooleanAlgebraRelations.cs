@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using backend_learning_algorithm.Common;
@@ -32,5 +30,12 @@ namespace backend_learning_algorithm.Controllers
         {
             return PathConsistency(network);
         }
+
+        [HttpPost("solveNetwork")]
+        public Network solveNetwork([FromBody] Network network)
+        {
+            return NetworkSolver.solver(network);
+        }
+
     }
 }
