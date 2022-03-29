@@ -3,7 +3,7 @@ namespace backend_learning_algorithm.Common
 {
     public class NetworkSolver
     {
-        public static Network Backtracking(Network network)
+        public static Network solver(Network network)
         {
             var networkIsSolved = false;
             var currentNetwork = network;
