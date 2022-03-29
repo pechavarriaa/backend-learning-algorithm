@@ -21,7 +21,6 @@ namespace backend_learning_algorithm.Common
                     }
                 }
             }
-
             return currentNetwork;
         }
     }
