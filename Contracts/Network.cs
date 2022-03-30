@@ -6,7 +6,11 @@ namespace backend_learning_algorithm.Contracts
     {
         public List<string> Variables { get; set; }
         public List<Relationship> NetworkRelations { get; set; }
-        public Network() { }
+        public Network()
+        {
+            NetworkRelations = new List<Relationship>();
+            Variables = new List<string>();
+        }
 
         public Network(List<string> variables, List<Relationship> networkRelations)
         {
