@@ -37,5 +37,11 @@ namespace backend_learning_algorithm.Controllers
             return NetworkSolver.solver(network);
         }
 
+        [HttpPost("solveNetworkWithPreferences")]
+        public Network solveNetworkWithPreferences([FromBody] NetworkWithPreferences networkWithPreferences)
+        {
+            return NetworkWithPreferencesSolver.solver(networkWithPreferences);
+        }
+
     }
 }
