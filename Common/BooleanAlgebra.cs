@@ -188,7 +188,22 @@ namespace backend_learning_algorithm.Common
             new List<BAR> { BAR.Preceded_by, BAR.Finishes, BAR.Preceded_by },
             new List<BAR> { BAR.Preceded_by, BAR.Overlapped_by, BAR.Preceded_by },
             new List<BAR> { BAR.Preceded_by, BAR.Met_by, BAR.Preceded_by },
-            new List<BAR> { BAR.Preceded_by, BAR.Preceded_by, BAR.Preceded_by }
+            new List<BAR> { BAR.Preceded_by, BAR.Preceded_by, BAR.Preceded_by },
+
+            // First Relation being Equal
+            new List<BAR> { BAR.Equal, BAR.Precedes, BAR.Precedes },
+            new List<BAR> { BAR.Equal, BAR.Meets, BAR.Meets  },
+            new List<BAR> { BAR.Equal, BAR.Overlaps, BAR.Overlaps },
+            new List<BAR> { BAR.Equal, BAR.Finished_by, BAR.Finished_by },
+            new List<BAR> { BAR.Equal, BAR.Contains, BAR.Contains },
+            new List<BAR> { BAR.Equal, BAR.Start, BAR.Start },
+            new List<BAR> { BAR.Equal, BAR.Equal, BAR.Equal },
+            new List<BAR> { BAR.Equal, BAR.Started_by, BAR.Started_by },
+            new List<BAR> { BAR.Equal, BAR.During, BAR.During },
+            new List<BAR> { BAR.Equal, BAR.Finishes, BAR.Finishes },
+            new List<BAR> { BAR.Equal, BAR.Overlapped_by, BAR.Overlapped_by},
+            new List<BAR> { BAR.Equal, BAR.Met_by, BAR.Met_by},
+            new List<BAR> { BAR.Equal, BAR.Preceded_by, BAR.Preceded_by }
         };
 
         public static List<BAR> TransitiveTableRecord(BAR firstRelation, BAR secondRelation)
